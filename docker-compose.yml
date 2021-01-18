@@ -1,0 +1,37 @@
+version: "3.3"
+
+services:
+  db:
+    container_name: mysql-PROJECT_NAME
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "580X:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: PROJECT_NAME_api
+
+  nginx:
+    container_name: nginx-PROJECT_NAME
+    build: images/nginx
+    command: nginx -g "daemon off;"
+    links:
+      - php
+    ports:
+      - "800X:80"
+    depends_on:
+      - db
+
+  php:
+    container_name: php-PROJECT_NAME
+    build: images/php
+    volumes:
+      - ./api:/var/www/html
+    working_dir: /var/www/html/api/public
+    command: php-fpm
+    links:
+      - db:db
+    ports:
+      - "900X:9000"
+    depends_on:
+      - db
